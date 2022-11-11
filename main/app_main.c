@@ -12,6 +12,7 @@ static const char       *TAG_MAIN         = "app_main";
 static const char       *TAG_PRINT_STATUS = "Print Status";
 static const char       *TAG_TURN_ON_LED  = "Turn LED on";
 static const char       *TAG_TURN_OFF_LED = "Turn LED off";
+static const char       *TAG_ACTIVE_DELAY = "Actively waiting...";
 static SemaphoreHandle_t app_led_mutex    = NULL;
 static char              app_runtime_stat_buffer[APP_RUNTIME_STAT_BUFFER_SIZE];
 
@@ -19,10 +20,10 @@ static void
 app_active_delay(uint32_t ms)
 {
     // Using xTaskGetTickCount to get estimate of current time
-    uint32_t start_time   = xTaskGetTickCount();
-    uint32_t current_time = xTaskGetTickCount();
-    uint32_t delay_ticks  = ms / portTICK_RATE_MS;
-    while (current_time < start_time + delay_ticks)
+    uint32_t start_time     = xTaskGetTickCount();
+    uint32_t current_time   = xTaskGetTickCount();
+    uint32_t end_delay_time = (ms / portTICK_RATE_MS) + start_time;
+    while (current_time < end_delay_time)
     {
         current_time = xTaskGetTickCount();
     }
@@ -37,18 +38,12 @@ app_turn_on_led(void *arg)
         if (app_led_mutex != NULL)
         {
             // Poll the semaphore
-            if (xSemaphoreTake(app_led_mutex, APP_SEMAPHORE_TAKE_WAIT_TICK)
-                == pdTRUE)
+            while (xSemaphoreTake(app_led_mutex, APP_SEMAPHORE_TAKE_WAIT_TICK)
+                   != pdTRUE)
             {
-                gpio_set_level(APP_LED_PIN, 1);
-                xSemaphoreGive(app_led_mutex);
             }
-            else
-            {
-                // Unable to obtain semaphore if can reach here
-                ESP_LOGW(TAG_TURN_ON_LED,
-                         "Failed to obtain semaphore, despite polling.");
-            }
+            gpio_set_level(APP_LED_PIN, 1);
+            xSemaphoreGive(app_led_mutex);
         }
         ESP_LOGI(TAG_TURN_ON_LED, "Starting active wait...");
         app_active_delay(APP_500_MS);
@@ -66,22 +61,17 @@ app_turn_off_led(void *arg)
         if (app_led_mutex != NULL)
         {
             // Poll the semaphore
-            if (xSemaphoreTake(app_led_mutex, APP_SEMAPHORE_TAKE_WAIT_TICK)
-                == pdTRUE)
+            while (xSemaphoreTake(app_led_mutex, APP_SEMAPHORE_TAKE_WAIT_TICK)
+                   != pdTRUE)
             {
-                gpio_set_level(APP_LED_PIN, 0);
-                xSemaphoreGive(app_led_mutex);
             }
-            else
-            {
-                // Unable to obtain semaphore if can reach her
-                ESP_LOGW(TAG_TURN_OFF_LED,
-                         "Failed to obtain semaphore, despite polling.");
-            }
+            gpio_set_level(APP_LED_PIN, 0);
+            xSemaphoreGive(app_led_mutex);
         }
-        ESP_LOGI(TAG_TURN_ON_LED, "Starting active wait...");
+        ESP_LOGI(TAG_TURN_OFF_LED, "Starting active wait...");
         app_active_delay(APP_500_MS);
-        ESP_LOGI(TAG_TURN_ON_LED, "Changing from active wait to task delay...");
+        ESP_LOGI(TAG_TURN_OFF_LED,
+                 "Changing from active wait to task delay...");
         vTaskDelay(APP_ONE_SEC_TICKS);
     }
 }
@@ -95,29 +85,22 @@ app_print_status(void *arg)
         if (app_led_mutex != NULL)
         {
             // Poll the semaphore
-            if (xSemaphoreTake(app_led_mutex, APP_SEMAPHORE_TAKE_WAIT_TICK)
-                == pdTRUE)
+            while (xSemaphoreTake(app_led_mutex, APP_SEMAPHORE_TAKE_WAIT_TICK)
+                   != pdTRUE)
             {
-                bool led_is_on
-                    = gpio_get_level(APP_LED_PIN) == 0 ? false : true;
-                if (led_is_on)
-                {
-                    ESP_LOGI(TAG_PRINT_STATUS, "LED is currently on.");
-                }
-                else
-                {
-                    ESP_LOGI(TAG_PRINT_STATUS, "LED is currently on.");
-                }
-                xSemaphoreGive(app_led_mutex);
+            }
+            bool led_is_on = gpio_get_level(APP_LED_PIN) == 0 ? false : true;
+            xSemaphoreGive(app_led_mutex);
+            if (led_is_on)
+            {
+                ESP_LOGI(TAG_PRINT_STATUS, "LED is currently on.");
             }
             else
             {
-                // Unable to obtain semaphore if can reach here
-                ESP_LOGW(TAG_PRINT_STATUS,
-                         "Failed to obtain semaphore, despite polling.");
+                ESP_LOGI(TAG_PRINT_STATUS, "LED is currently on.");
             }
         }
-        
+
         vTaskDelay(APP_ONE_SEC_TICKS);
     }
 }
