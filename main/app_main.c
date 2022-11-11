@@ -14,7 +14,6 @@ static const char       *TAG_TURN_ON_LED  = "Turn LED on";
 static const char       *TAG_TURN_OFF_LED = "Turn LED off";
 static const char       *TAG_ACTIVE_DELAY = "Actively waiting...";
 static SemaphoreHandle_t app_led_mutex    = NULL;
-static char              app_runtime_stat_buffer[APP_RUNTIME_STAT_BUFFER_SIZE];
 
 static void
 app_active_delay(uint32_t ms)
@@ -23,9 +22,9 @@ app_active_delay(uint32_t ms)
     uint32_t start_time     = xTaskGetTickCount();
     uint32_t current_time   = xTaskGetTickCount();
     uint32_t end_delay_time = (ms / portTICK_RATE_MS) + start_time;
-    
+
     ESP_LOGD(TAG_ACTIVE_DELAY, "Actively waiting for %d ms...", ms);
-    
+
     while (current_time < end_delay_time)
     {
         current_time = xTaskGetTickCount();
@@ -111,9 +110,6 @@ app_print_status(void *arg)
 void
 app_main(void)
 {
-    // Initialize arrays.
-    memset(app_runtime_stat_buffer, APP_RUNTIME_STAT_BUFFER_SIZE, sizeof(char));
-
     // Configure led output pin to output on gpio2
     gpio_config_t led_io_conf;
     led_io_conf.intr_type    = GPIO_INTR_DISABLE;
