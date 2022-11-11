@@ -23,10 +23,15 @@
 
 #include "driver/gpio.h"
 
+// Configuration for FreeRTOS
+#define configUSE_PREEMPTION 1
+#define configUSE_TIME_SLICING 1
+#define configUSE_MUTEXES 1
+
 #define APP_TASK_STACK_SIZE 2048
-#define APP_TASK_PRIORITY_TURN_OFF_LED 10
-#define APP_TASK_PRIORITY_TURN_ON_LED 9
-#define APP_TASK_PRIORITY_PRINT_STATUS 5
+#define APP_TASK_PRIORITY_TURN_OFF_LED 7
+#define APP_TASK_PRIORITY_TURN_ON_LED 7
+#define APP_TASK_PRIORITY_PRINT_STATUS 7
 
 #define APP_500_MS 500
 #define APP_ONE_SEC_TICKS (1000 / portTICK_RATE_MS)

@@ -23,6 +23,9 @@ app_active_delay(uint32_t ms)
     uint32_t start_time     = xTaskGetTickCount();
     uint32_t current_time   = xTaskGetTickCount();
     uint32_t end_delay_time = (ms / portTICK_RATE_MS) + start_time;
+    
+    ESP_LOGD(TAG_ACTIVE_DELAY, "Actively waiting for %d ms...", ms);
+    
     while (current_time < end_delay_time)
     {
         current_time = xTaskGetTickCount();
@@ -97,7 +100,7 @@ app_print_status(void *arg)
             }
             else
             {
-                ESP_LOGI(TAG_PRINT_STATUS, "LED is currently on.");
+                ESP_LOGI(TAG_PRINT_STATUS, "LED is currently off.");
             }
         }
 
