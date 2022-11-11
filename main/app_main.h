@@ -28,11 +28,15 @@
 #define APP_TASK_PRIORITY_TURN_ON_LED 9
 #define APP_TASK_PRIORITY_PRINT_STATUS 5
 
-#define APP_HALF_SEC_TICKS (500 / portTICK_RATE_MS)
-#define APP_TASK_DELAY (1000 / portTICK_RATE_MS)
+#define APP_500_MS (500 / portTICK_RATE_MS)
+#define APP_ONE_SEC_TICKS (1000 / portTICK_RATE_MS)
 
 #define APP_LED_PIN 2
 #define APP_LED_PIN_SEL (1ULL << APP_LED_PIN)
+
+#define APP_SEMAPHORE_TAKE_WAIT_TICK ((TickType_t) 1)
+
+#define APP_RUNTIME_STAT_BUFFER_SIZE 200
 
 static void app_turn_on_led(void *arg);
 
