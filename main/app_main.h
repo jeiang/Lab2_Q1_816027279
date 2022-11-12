@@ -23,15 +23,37 @@
 
 #include "driver/gpio.h"
 
-// Configuration for FreeRTOS
-#define configUSE_PREEMPTION   1
-#define configUSE_TIME_SLICING 1
-#define configUSE_MUTEXES      1
+#define configUSE_MUTEXES 1
 
-#define APP_TASK_STACK_SIZE            2048
+// App Configuration
+// Determines whether Round Robin or Priority Inheritance is used
+//#define APP_ROUND_ROBIN_TASKS
+// Determines whether the processor is put to sleep if the Idle Hook is used
+//#define APP_USE_IDLE_SLEEP
+
+// Declarations based on App Configuration
+#ifdef APP_ROUND_ROBIN_TASKS
+// Use Round Robin Scheduling
+#define configUSE_PREEMPTION           1
+#define configUSE_TIME_SLICING         1
 #define APP_TASK_PRIORITY_TURN_OFF_LED 7
 #define APP_TASK_PRIORITY_TURN_ON_LED  7
 #define APP_TASK_PRIORITY_PRINT_STATUS 7
+#else
+// Use priority inheritance
+#define APP_TASK_PRIORITY_TURN_OFF_LED 10
+#define APP_TASK_PRIORITY_TURN_ON_LED  5
+#define APP_TASK_PRIORITY_PRINT_STATUS 1
+#endif
+
+#ifdef APP_USE_IDLE_SLEEP
+#include "esp_sleep.h"
+#define configUSE_IDLE_HOOK 1
+#define APP_LIGHT_SLEEP_US  25000
+#endif
+
+// Misc Constants
+#define APP_TASK_STACK_SIZE 2048
 
 #define APP_500_MS        500
 #define APP_ONE_SEC_TICKS (1000 / portTICK_RATE_MS)
@@ -41,12 +63,31 @@
 
 #define APP_SEMAPHORE_TAKE_WAIT_TICK ((TickType_t)1)
 
-#define APP_RUNTIME_STAT_BUFFER_SIZE 200
+#define APP_STATS_OUTPUT_BUFFER_SIZE 500
 
+// Function Stubs
+
+#ifdef APP_USE_IDLE_SLEEP
+/**
+ * @brief Is called when the IDLE task is triggered i.e. when the processor is
+ * idling.
+ */
+void vApplicationIdleHook(void);
+#endif
+
+/**
+ * @brief Turns on the LED on GPIO2
+ */
 static void app_turn_on_led(void *arg);
 
+/**
+ * @brief Turns off the LED on GPIO2
+ */
 static void app_turn_off_led(void *arg);
 
+/**
+ * @brief Prints the current status of the LED on GPIO2
+ */
 static void app_print_status(void *arg);
 
 /**

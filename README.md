@@ -5,9 +5,12 @@
 The various versions are managed using releases/tags.
 
 The tags are as follows:
-- exercise1: Code for P2 Q1
-- exercise2: Code for P2 Q2
-- exercise3: Code for P2 Q3
+- rrsched: Round Robin Scheduling without sleep on idle
+- priorinherit: Priority Inheritance without sleep on idle
+- priorinherit-alt: Priority Inheritance with modified priorities and no sleep on idle
+- rrsched-sleep: Round Robin Scheduling with sleep on idle
+- priorinherit-sleep: Priority Inheritance with sleep on idle
+- priorinherit-alt-sleep: Priority Inheritance with modified priorities and sleep on idle
 
 ## P1
 - /project/sdkconfig
