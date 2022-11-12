@@ -26,19 +26,15 @@ The tags are as follows:
   - This specifies the behaviour of freertos on the esp8266
 
 ## P2
-1. Create an example application with three tasks that are created in app_main. Two tasks should share a single GPIO 
-pin (you may use the pin connected to the built-in LED for convenience). One task will turn the GPIO pin on, actively
-wait for 0.5 seconds, and task-delay for 1 second. The other will turn the GPIO pin off, actively wait for 0.5 seconds,
-and task-delay for 1 second. The GPIO pin should be managed using a semaphore/mutex. The third task will print a status
-message only, and task-delay for 1 second. Each task should have it's own priority level. Build and run your code.
+### Question 2 - Vary the assigned priorities for your tasks, and look at the difference in performance. Is it what you expected?
+The changing the assigned priorities did not change the performance much. The usage by each task usually matched each
+other. This is likely because each task relied on the execution before it to pass the semaphore, hence the priority was
+usually passed down to the lowest task, which was then increased by the highest priority task. This was what I had
+expected, given that the amount of execution time for each was expected to be low compared to the delay of 1 second 
+each had.
 
-2. Adjust the example from 1) in the following ways: 
-    1. set the example to round-robin scheduling where tasks have the 
-same priority
-    2. utilise Priority Inheritance to manage the mutex. 
-  
-Vary the assigned priorities for your tasks, and look at the difference in performance. Is it what you expected?
-
-3. Use the IDLE "hook" function to put the processor to sleep for some time when the system is not going to be 
-"in-use". Does the use of the processor sleep affect the system performance?
-
+### Question 3 - Does the use of the processor sleep affect the system performance? 
+The use of processor sleep did1 affect performance. The impact was likely due to the overhead associated with sleeping 
+and waking up the processor, but the sleep time chosen was small. The overall effect was that the percent usage for the
+IDLE task increased (and the other tasks decreased). The percent usage for the IDLE task (without sleep) was normally 
+27%, but with sleep it increased to around 33% (matching the LED on and off tasks).
