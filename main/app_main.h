@@ -27,9 +27,11 @@
 
 // App Configuration
 // Determines whether Round Robin or Priority Inheritance is used
-//#define APP_ROUND_ROBIN_TASKS
+#define APP_ROUND_ROBIN_TASKS
 // Determines whether the processor is put to sleep if the Idle Hook is used
 //#define APP_USE_IDLE_SLEEP
+// Uses alternative priorities for priority inheritance
+//#define APP_USE_ALT_PRIORITIES
 
 // Declarations based on App Configuration
 #ifdef APP_ROUND_ROBIN_TASKS
@@ -41,9 +43,15 @@
 #define APP_TASK_PRIORITY_PRINT_STATUS 7
 #else
 // Use priority inheritance
+#ifdef APP_USE_ALT_PRIORITIES
 #define APP_TASK_PRIORITY_TURN_OFF_LED 10
 #define APP_TASK_PRIORITY_TURN_ON_LED  5
 #define APP_TASK_PRIORITY_PRINT_STATUS 1
+#else
+#define APP_TASK_PRIORITY_TURN_OFF_LED 4
+#define APP_TASK_PRIORITY_TURN_ON_LED  9
+#define APP_TASK_PRIORITY_PRINT_STATUS 10
+#endif
 #endif
 
 #ifdef APP_USE_IDLE_SLEEP
