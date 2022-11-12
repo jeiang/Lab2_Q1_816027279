@@ -12,6 +12,8 @@ The tags are as follows:
 - priorinherit-sleep: Priority Inheritance with sleep on idle
 - priorinherit-alt-sleep: Priority Inheritance with modified priorities and sleep on idle
 
+All binaries and output files are available under the assets for each release.
+
 ## P1
 - /project/sdkconfig
   
